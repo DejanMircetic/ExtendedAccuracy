@@ -5,6 +5,7 @@
 ## test enables a subset of x and f to be tested.
 # MASE: d is the # of differencing
 # MASE: D is the # of seasonal differencing
+
 testaccuracy <- function(f, x, test, d, D, benchmark,trainingset) {
   #browser()#trainging set je dodat da bi racunao i MASE gresku za modele koji nisu forecast
   #dx se koristi za MASE gresku, to je train set ustvari
