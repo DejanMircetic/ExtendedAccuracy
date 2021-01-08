@@ -68,7 +68,6 @@ testaccuracy <- function(f, x, test, d, D, benchmark,trainingset) {
   ff <- f
   xx <- x
 
-
   # Check length of f
   if (length(f) < n) {
     stop("Not enough forecasts. Check that forecasts and test data match.")
@@ -109,6 +108,32 @@ testaccuracy <- function(f, x, test, d, D, benchmark,trainingset) {
   }
 
   # Additional time series measures
+
+  # Compute RMSSE if historical data available
+  if (!is.null(dx)) {
+    tspdx <- tsp(dx)
+    if (!is.null(tspdx)) {
+      if (D > 0) { # seasonal differencing
+        nsd <- diff(dx, lag = round(tspdx[3L]), differences = D)
+      } else { # non seasonal differencing
+        nsd <- dx
+      }
+      if (d > 0) {
+        nd <- diff(nsd, differences = d)
+      } else {
+        nd <- nsd
+      }
+      scale2 <- mean((nd)^2, na.rm = TRUE)
+    } else { # not time series
+      scale2 <- mean((dx - mean(dx, na.rm = TRUE))^2, na.rm = TRUE)
+    }
+    rmsse <- mean((error^2 / scale2), na.rm = TRUE)
+    out <- c(out, rmsse)
+    names(out)[length(out)] <- "RMSSE"
+  }
+
+  # Additional time series measures
+
   if (!is.null(tsp(x)) && n > 1) {
     fpe <- (c(ff[2:n]) / c(xx[1:(n - 1)]) - 1)[test - 1]
     ape <- (c(xx[2:n]) / c(xx[1:(n - 1)]) - 1)[test - 1]
@@ -258,6 +283,28 @@ trainingaccuracy <- function(f, test, d, D,benchmark) {
     mase <- mean(abs(res / scale), na.rm = TRUE)
     out <- c(out, mase)
     names(out)[length(out)] <- "MASE"
+  }
+
+  # Compute RMSSE if historical data available
+  if (!is.null(dx)) {
+    if (!is.null(tspdx)) {
+      if (D > 0) { # seasonal differencing
+        nsd <- diff(dx, lag = round(tspdx[3L]), differences = D)
+      } else { # non seasonal differencing
+        nsd <- dx
+      }
+      if (d > 0) {
+        nd <- diff(nsd, differences = d)
+      } else {
+        nd <- nsd
+      }
+      scale2 <- mean((nd)^2, na.rm = TRUE)
+    } else { # not time series
+      scale2 <- mean((dx - mean(dx, na.rm = TRUE))^2, na.rm = TRUE)
+    }
+    rmsse <- mean((res^2 / scale2), na.rm = TRUE)
+    out <- c(out, rmsse)
+    names(out)[length(out)] <- "RMSSE"
   }
 
   # Additional time series measures
