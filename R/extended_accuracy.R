@@ -302,7 +302,7 @@ trainingaccuracy <- function(f, test, d, D,benchmark) {
     } else { # not time series
       scale2 <- mean((dx - mean(dx, na.rm = TRUE))^2, na.rm = TRUE)
     }
-    rmsse <- mean((res^2 / scale2), na.rm = TRUE)
+    rmsse <- sqrt(mean((res^2 / scale2), na.rm = TRUE))
     out <- c(out, rmsse)
     names(out)[length(out)] <- "RMSSE"
   }
